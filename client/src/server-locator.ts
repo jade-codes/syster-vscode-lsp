@@ -33,12 +33,7 @@ export async function findServerBinary(options: ServerLocatorOptions = {}): Prom
         {
             name: 'Configuration setting (syster.lsp.path)',
             path: () => {
-                const configured = vscode.workspace.getConfiguration('syster').get<string>('lsp.path');
-                // Only use if it's not the default dev path
-                if (configured && !configured.includes('/workspaces/syster/')) {
-                    return configured;
-                }
-                return null;
+                return vscode.workspace.getConfiguration('syster').get<string>('lsp.path') || null;
             }
         },
         // 2. Bundled with extension (for published extension)
@@ -48,54 +43,6 @@ export async function findServerBinary(options: ServerLocatorOptions = {}): Prom
                 if (!extensionPath) return null;
                 const binaryName = getPlatformBinaryName();
                 return path.join(extensionPath, 'server', binaryName);
-            }
-        },
-        // 3. Development fallback - workspace relative paths
-        {
-            name: 'Development build (release)',
-            path: () => {
-                // Try to find the workspace root by looking for Cargo.toml
-                const workspaceFolders = vscode.workspace.workspaceFolders;
-                if (workspaceFolders) {
-                    for (const folder of workspaceFolders) {
-                        // Check if this is the syster workspace or a parent
-                        const candidates = [
-                            path.join(folder.uri.fsPath, 'target', 'release', 'syster-lsp'),
-                            path.join(folder.uri.fsPath, '..', '..', 'target', 'release', 'syster-lsp'),
-                            path.join(folder.uri.fsPath, '..', '..', '..', 'target', 'release', 'syster-lsp'),
-                        ];
-                        for (const candidate of candidates) {
-                            if (fs.existsSync(candidate)) {
-                                return candidate;
-                            }
-                        }
-                    }
-                }
-                // Fallback to common dev paths
-                const homedir = process.env.HOME || process.env.USERPROFILE || '';
-                return path.join(homedir, 'syster', 'target', 'release', 'syster-lsp');
-            }
-        },
-        {
-            name: 'Development build (debug)',
-            path: () => {
-                const workspaceFolders = vscode.workspace.workspaceFolders;
-                if (workspaceFolders) {
-                    for (const folder of workspaceFolders) {
-                        const candidates = [
-                            path.join(folder.uri.fsPath, 'target', 'debug', 'syster-lsp'),
-                            path.join(folder.uri.fsPath, '..', '..', 'target', 'debug', 'syster-lsp'),
-                            path.join(folder.uri.fsPath, '..', '..', '..', 'target', 'debug', 'syster-lsp'),
-                        ];
-                        for (const candidate of candidates) {
-                            if (fs.existsSync(candidate)) {
-                                return candidate;
-                            }
-                        }
-                    }
-                }
-                const homedir = process.env.HOME || process.env.USERPROFILE || '';
-                return path.join(homedir, 'syster', 'target', 'debug', 'syster-lsp');
             }
         }
     ];
