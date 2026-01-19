@@ -2,6 +2,21 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.1.9-alpha] - 2026-01-19
+
+### Added
+- Documentation comments now displayed in hover tooltips
+- LSP server binary bundled directly from crates.io (`syster-lsp v0.1.10-alpha`)
+
+### Improved
+- Symbol lookup uses ReferenceIndex for more accurate hover on type references
+- Simplified server-locator.ts (config path + bundled path only)
+- Build process uses `cargo install` from crates.io for reproducible builds
+
+### Dependencies
+- syster-lsp v0.1.10-alpha (from crates.io)
+- syster-base v0.1.11-alpha
+
 ## [0.1.8-alpha] - 2026-01-15
 
 ### Added
