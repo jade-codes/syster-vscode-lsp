@@ -47,9 +47,15 @@ run-guidelines:
 	@echo "=== ✓ All guidelines passed! ==="
 
 package:
+	@echo "Installing LSP server from crates.io..."
+	@cargo install syster-lsp --version 0.1.10-alpha --root ./server-install --force
+	@echo "Copying server binary..."
+	@mkdir -p server
+	@cp ./server-install/bin/syster-lsp server/syster-lsp-$$(uname -s | tr '[:upper:]' '[:lower:]')-$$(uname -m | sed 's/x86_64/x64/' | sed 's/aarch64/arm64/')
+	@rm -rf ./server-install
 	@echo "Packaging extension..."
 	@npx vsce package
 	@echo "✓ Package created"
 
 clean:
-	rm -rf node_modules out dist *.vsix
+	rm -rf node_modules out dist *.vsix server/ server-install/
