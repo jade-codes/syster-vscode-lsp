@@ -112,7 +112,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run build-server && npm run esbuild-base -- --minify",
+    "vscode:prepublish": "npm run build-server && npm run build-stdlib && npm run esbuild-base -- --minify",
     "compile": "tsc -p ./",
     "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
@@ -122,6 +122,7 @@
     "test": "echo \"No tests yet\" && exit 0",
     "build-server": "cargo install syster-lsp --version 0.1.12-alpha --root ./server-install --force && npm run copy-server && rm -rf ./server-install",
     "copy-server": "mkdir -p server && cp ./server-install/bin/syster-lsp server/syster-lsp-$(node -e \"console.log(process.platform + '-' + process.arch)\")",
+    "build-stdlib": "node scripts/download-stdlib.js",
     "package": "vsce package"
   },
   "dependencies": {
