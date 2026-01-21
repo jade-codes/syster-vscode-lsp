@@ -120,7 +120,7 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint client/src --ext ts",
     "test": "echo \"No tests yet\" && exit 0",
-    "build-server": "cargo install syster-lsp --version 0.1.10-alpha --root ./server-install --force && npm run copy-server && rm -rf ./server-install",
+    "build-server": "cargo install syster-lsp --version 0.1.12-alpha --root ./server-install --force && npm run copy-server && rm -rf ./server-install",
     "copy-server": "mkdir -p server && cp ./server-install/bin/syster-lsp server/syster-lsp-$(node -e \"console.log(process.platform + '-' + process.arch)\")",
     "package": "vsce package"
   },
