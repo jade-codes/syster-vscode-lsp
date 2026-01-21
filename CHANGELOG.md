@@ -2,6 +2,16 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.1.12-alpha] - 2026-01-21
+
+### Changed
+- Updated to use syster-lsp v0.1.12-alpha
+- Synced version with syster-base and syster-lsp releases
+
+### Dependencies
+- syster-lsp v0.1.12-alpha (from crates.io)
+- syster-base v0.1.12-alpha
+
 ## [0.1.9-alpha] - 2026-01-19
 
 ### Added
