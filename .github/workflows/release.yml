@@ -30,5 +30,4 @@ jobs:
     with:
       dry-run: ${{ inputs.dry-run || false }}
     secrets:
-      VSCE_PAT: ${{ secrets.VSCE_PAT }}
       OVSX_PAT: ${{ secrets.OVSX_PAT }}
