@@ -112,7 +112,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run build-server && npm run build-stdlib && npm run esbuild-base -- --minify",
+    "vscode:prepublish": "npm run build-server && npm run esbuild-base -- --minify",
     "compile": "tsc -p ./",
     "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
@@ -121,7 +121,6 @@
     "lint": "eslint client/src --ext ts",
     "test": "echo \"No tests yet\" && exit 0",
     "build-server": "node scripts/download-server.js",
-    "build-stdlib": "node scripts/download-stdlib.js",
     "package": "vsce package"
   },
   "dependencies": {

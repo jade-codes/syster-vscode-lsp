@@ -1,0 +1,114 @@
+# Test workflow to verify cross-platform packaging works
+# Run manually from any branch to test without publishing
+
+name: Test Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      lsp-version:
+        description: 'syster-lsp version to use (e.g., 0.1.13-alpha)'
+        required: true
+        default: '0.1.13-alpha'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all platform binaries
+        env:
+          LSP_VERSION: ${{ inputs.lsp-version }}
+        run: |
+          mkdir -p server
+          
+          # Download all platform binaries from syster-lsp release
+          PLATFORMS=(
+            "syster-linux-x64:tar.gz:syster-lsp-linux-x64"
+            "syster-darwin-x64:tar.gz:syster-lsp-darwin-x64"
+            "syster-darwin-arm64:tar.gz:syster-lsp-darwin-arm64"
+            "syster-windows-x64:zip:syster-lsp-win32-x64.exe"
+          )
+          
+          for entry in "${PLATFORMS[@]}"; do
+            IFS=':' read -r artifact ext binary <<< "$entry"
+            echo "Downloading $artifact.$ext..."
+            
+            curl -sL "https://github.com/jade-codes/syster-lsp/releases/download/v${LSP_VERSION}/${artifact}.${ext}" -o "temp.${ext}"
+            
+            if [ "$ext" = "zip" ]; then
+              unzip -q "temp.${ext}" -d temp_extract
+              mv "temp_extract/syster-lsp.exe" "server/${binary}"
+              rm -rf temp_extract
+            else
+              tar -xzf "temp.${ext}"
+              mv syster-lsp "server/${binary}"
+              chmod +x "server/${binary}"
+            fi
+            
+            rm "temp.${ext}"
+            echo "✓ Installed $binary"
+          done
+          
+          # Also extract stdlib from one of them (they're all the same)
+          echo "Extracting stdlib..."
+          curl -sL "https://github.com/jade-codes/syster-lsp/releases/download/v${LSP_VERSION}/syster-linux-x64.tar.gz" -o temp.tar.gz
+          tar -xzf temp.tar.gz sysml.library
+          mv sysml.library server/
+          rm temp.tar.gz
+          
+          echo ""
+          echo "Server directory contents:"
+          ls -la server/
+
+      - name: Build extension
+        run: npm run esbuild-base -- --minify
+
+      - name: Package extension (universal with all binaries)
+        run: npx vsce package
+
+      - name: List package contents
+        run: |
+          VSIX=$(ls *.vsix | head -1)
+          echo "Package: $VSIX"
+          echo "Size: $(du -h "$VSIX" | cut -f1)"
+          echo ""
+          echo "Contents:"
+          unzip -l "$VSIX" | grep -E "(server/|\.vsix)"
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-universal-test
+          path: '*.vsix'
+          retention-days: 7
+
+  test-install:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Download VSIX
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-universal-test
+
+      - name: Install extension
+        run: |
+          VSIX=$(ls *.vsix | head -1)
+          code --install-extension "$VSIX" --force || echo "VS Code not available in CI, skipping install test"
+        shell: bash

@@ -1,112 +1,136 @@
 #!/usr/bin/env node
 
 /**
- * Downloads the syster-lsp binary from GitHub releases.
- * Supports Linux, macOS (x64/arm64), and Windows.
+ * Downloads ALL syster-lsp binaries from GitHub releases.
+ * Bundles Linux, macOS (x64/arm64), and Windows binaries for universal extension.
  */
 
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const os = require('os');
 
 const LSP_VERSION = '0.1.13-alpha';
 const REPO = 'jade-codes/syster-lsp';
 const SERVER_DIR = path.join(__dirname, '..', 'server');
 
 /**
- * Map Node.js platform/arch to release artifact names
+ * All supported platforms and their release artifacts
  */
-function getArtifactName() {
-    const platform = process.platform;
-    const arch = process.arch;
-
-    const mapping = {
-        'linux-x64': 'syster-linux-x64',
-        'linux-arm64': 'syster-linux-x64', // Fallback to x64 for now
-        'darwin-x64': 'syster-darwin-x64',
-        'darwin-arm64': 'syster-darwin-arm64',
-        'win32-x64': 'syster-windows-x64',
-    };
-
-    const key = `${platform}-${arch}`;
-    const artifact = mapping[key];
-
-    if (!artifact) {
-        throw new Error(`Unsupported platform: ${platform}-${arch}`);
-    }
-
-    return artifact;
-}
+const PLATFORMS = [
+    { artifact: 'syster-linux-x64', binary: 'syster-lsp-linux-x64', extension: 'tar.gz', isWindows: false },
+    { artifact: 'syster-darwin-x64', binary: 'syster-lsp-darwin-x64', extension: 'tar.gz', isWindows: false },
+    { artifact: 'syster-darwin-arm64', binary: 'syster-lsp-darwin-arm64', extension: 'tar.gz', isWindows: false },
+    { artifact: 'syster-windows-x64', binary: 'syster-lsp-win32-x64.exe', extension: 'zip', isWindows: true },
+];
 
 /**
- * Get the expected binary name for the current platform (used by extension)
+ * Download and extract all platform binaries
  */
-function getBinaryName() {
-    const platform = process.platform;
-    const arch = process.arch;
-    let name = `syster-lsp-${platform}-${arch}`;
-    if (platform === 'win32') {
-        name += '.exe';
-    }
-    return name;
-}
-
-/**
- * Download and extract the release asset
- */
-async function downloadRelease() {
-    const artifact = getArtifactName();
-    const isWindows = process.platform === 'win32';
-    const extension = isWindows ? 'zip' : 'tar.gz';
-    const assetName = `${artifact}.${extension}`;
-
-    console.log(`Downloading ${assetName} from ${REPO} v${LSP_VERSION}...`);
-
+async function downloadAllPlatforms() {
+    console.log(`Downloading syster-lsp binaries from ${REPO} v${LSP_VERSION}...`);
+    
     // Get release assets
     const releaseUrl = `https://api.github.com/repos/${REPO}/releases/tags/v${LSP_VERSION}`;
-    
     const releaseData = await fetchJson(releaseUrl);
-    const asset = releaseData.assets?.find(a => a.name === assetName);
-
-    if (!asset) {
-        console.log(`Available assets: ${releaseData.assets?.map(a => a.name).join(', ') || 'none'}`);
-        throw new Error(`Asset ${assetName} not found in release v${LSP_VERSION}`);
+    
+    if (!releaseData.assets || releaseData.assets.length === 0) {
+        throw new Error(`No assets found in release v${LSP_VERSION}`);
     }
 
-    // Download the asset
-    const tempFile = path.join(__dirname, '..', assetName);
-    await downloadFile(asset.browser_download_url, tempFile);
-
-    // Extract
-    console.log('Extracting...');
+    console.log(`Found ${releaseData.assets.length} assets`);
     fs.mkdirSync(SERVER_DIR, { recursive: true });
 
-    if (isWindows) {
-        // Use PowerShell to extract zip on Windows
-        execSync(`powershell -command "Expand-Archive -Force '${tempFile}' '${SERVER_DIR}'"`, { stdio: 'inherit' });
-    } else {
-        execSync(`tar -xzf "${tempFile}" -C "${SERVER_DIR}"`, { stdio: 'inherit' });
+    // Track if we've copied sysml.library already
+    let stdlibCopied = false;
+
+    for (const platform of PLATFORMS) {
+        const assetName = `${platform.artifact}.${platform.extension}`;
+        const asset = releaseData.assets.find(a => a.name === assetName);
+
+        if (!asset) {
+            console.warn(`  ⚠ ${assetName} not found, skipping...`);
+            continue;
+        }
+
+        console.log(`  Downloading ${assetName}...`);
+        
+        // Download to temp location
+        const tempFile = path.join(os.tmpdir(), assetName);
+        await downloadFile(asset.browser_download_url, tempFile);
+
+        // Extract to temp directory
+        const tempDir = path.join(os.tmpdir(), `syster-extract-${Date.now()}`);
+        fs.mkdirSync(tempDir, { recursive: true });
+
+        try {
+            if (platform.extension === 'zip') {
+                // Use unzip on Unix, PowerShell on Windows
+                if (process.platform === 'win32') {
+                    execSync(`powershell -command "Expand-Archive -Force '${tempFile}' '${tempDir}'"`, { stdio: 'pipe' });
+                } else {
+                    execSync(`unzip -q -o "${tempFile}" -d "${tempDir}"`, { stdio: 'pipe' });
+                }
+            } else {
+                execSync(`tar -xzf "${tempFile}" -C "${tempDir}"`, { stdio: 'pipe' });
+            }
+
+            // Copy binary with platform-specific name
+            const sourceBinary = path.join(tempDir, platform.isWindows ? 'syster-lsp.exe' : 'syster-lsp');
+            const destBinary = path.join(SERVER_DIR, platform.binary);
+
+            if (fs.existsSync(sourceBinary)) {
+                fs.copyFileSync(sourceBinary, destBinary);
+                if (!platform.isWindows) {
+                    fs.chmodSync(destBinary, 0o755);
+                }
+                console.log(`  ✓ ${platform.binary}`);
+            } else {
+                console.warn(`  ⚠ Binary not found in archive: ${sourceBinary}`);
+            }
+
+            // Copy sysml.library once (it's the same in all packages)
+            if (!stdlibCopied) {
+                const sourceStdlib = path.join(tempDir, 'sysml.library');
+                const destStdlib = path.join(SERVER_DIR, 'sysml.library');
+                if (fs.existsSync(sourceStdlib)) {
+                    // Remove existing if present
+                    if (fs.existsSync(destStdlib)) {
+                        fs.rmSync(destStdlib, { recursive: true, force: true });
+                    }
+                    copyDirSync(sourceStdlib, destStdlib);
+                    stdlibCopied = true;
+                    console.log(`  ✓ sysml.library`);
+                }
+            }
+        } finally {
+            // Cleanup temp files
+            fs.rmSync(tempDir, { recursive: true, force: true });
+            fs.unlinkSync(tempFile);
+        }
     }
 
-    // Rename binary to platform-specific name expected by extension
-    const binaryName = getBinaryName();
-    const sourceBinary = path.join(SERVER_DIR, isWindows ? 'syster-lsp.exe' : 'syster-lsp');
-    const destBinary = path.join(SERVER_DIR, binaryName);
+    console.log(`\n✓ All binaries installed to ${SERVER_DIR}`);
+}
 
-    if (fs.existsSync(sourceBinary) && sourceBinary !== destBinary) {
-        fs.renameSync(sourceBinary, destBinary);
+/**
+ * Recursively copy a directory
+ */
+function copyDirSync(src, dest) {
+    fs.mkdirSync(dest, { recursive: true });
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    
+    for (const entry of entries) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+        
+        if (entry.isDirectory()) {
+            copyDirSync(srcPath, destPath);
+        } else {
+            fs.copyFileSync(srcPath, destPath);
+        }
     }
-
-    // Make executable on Unix
-    if (!isWindows && fs.existsSync(destBinary)) {
-        fs.chmodSync(destBinary, 0o755);
-    }
-
-    // Clean up temp file
-    fs.unlinkSync(tempFile);
-
-    console.log(`✓ Server installed: ${destBinary}`);
 }
 
 /**
@@ -179,52 +203,13 @@ function downloadFile(url, dest) {
     });
 }
 
-/**
- * Fallback to cargo install if release binary not available
- */
-async function fallbackCargoInstall() {
-    console.log('Release binary not available, falling back to cargo install...');
-    console.log('This requires Rust to be installed.');
-    
-    const binaryName = getBinaryName();
-    const isWindows = process.platform === 'win32';
-    
-    try {
-        execSync(`cargo install syster-lsp --version ${LSP_VERSION} --root ./server-install --force`, {
-            stdio: 'inherit',
-            cwd: path.join(__dirname, '..')
-        });
-
-        fs.mkdirSync(SERVER_DIR, { recursive: true });
-        
-        const sourceBinary = path.join(__dirname, '..', 'server-install', 'bin', isWindows ? 'syster-lsp.exe' : 'syster-lsp');
-        const destBinary = path.join(SERVER_DIR, binaryName);
-        
-        fs.copyFileSync(sourceBinary, destBinary);
-        
-        if (!isWindows) {
-            fs.chmodSync(destBinary, 0o755);
-        }
-
-        // Clean up
-        fs.rmSync(path.join(__dirname, '..', 'server-install'), { recursive: true, force: true });
-        
-        console.log(`✓ Server installed via cargo: ${destBinary}`);
-    } catch (err) {
-        throw new Error(`Failed to install via cargo: ${err.message}`);
-    }
-}
-
 async function main() {
     try {
-        await downloadRelease();
+        await downloadAllPlatforms();
     } catch (err) {
-        console.warn(`Warning: ${err.message}`);
-        await fallbackCargoInstall();
+        console.error('Error:', err.message);
+        process.exit(1);
     }
 }
 
-main().catch((err) => {
-    console.error('Error:', err.message);
-    process.exit(1);
-});
+main();

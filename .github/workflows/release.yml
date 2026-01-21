@@ -14,6 +14,11 @@ on:
         description: 'Version to release (e.g., 1.0.0)'
         required: true
         type: string
+      dry-run:
+        description: 'Build and package but skip publishing'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -22,5 +27,8 @@ permissions:
 jobs:
   vscode-release:
     uses: jade-codes/syster-pipelines/.github/workflows/vscode-release.yml@main
+    with:
+      dry-run: ${{ inputs.dry-run || false }}
     secrets:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
       OVSX_PAT: ${{ secrets.OVSX_PAT }}
