@@ -2,6 +2,37 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.1.12-alpha] - 2026-01-21
+
+### Added
+- **SysML standard library bundled with extension** - No more external stdlib setup required
+- Support for `Dependency` elements in SysML models
+- Expression references tracking in Usage and Element structures
+- Feature chain context support for relationship types
+- `Transition` support in UsageKind and SemanticRole
+- Import phase resolution with scope-aware symbol lookup
+- Enhanced `Comment` structure with `about` references
+
+### Improved
+- **Name resolution performance** - Optimized scope chain walking for direct symbols
+- **Import resolution** - Prevents infinite recursion when resolving imports
+- **ReferenceIndex** - Enhanced indexing with 200+ lines of improvements for faster lookups
+- **Symbol table** - Improved lookup and scope handling with better caching
+- **Parser performance** - Significantly enhanced SysML AST parsing (1400+ lines of parser improvements)
+- **Semantic visitor** - Optimized SysML visitor with 600+ lines of enhancements
+- Documentation whitespace trimming in hover tooltips
+- Better span information for all AST elements
+
+### Fixed
+- Alias resolution edge cases
+- Constraints and perform action parsing
+- Symbol::Comment handling across all LSP features
+- Test suite optimizations (disabled stdlib in unit tests for 10x faster CI)
+
+### Dependencies
+- syster-lsp v0.1.12-alpha (from crates.io)
+- syster-base v0.1.12-alpha
+
 ## [0.1.9-alpha] - 2026-01-19
 
 ### Added

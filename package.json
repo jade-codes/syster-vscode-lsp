@@ -2,7 +2,7 @@
   "name": "sysml-language-support",
   "displayName": "SysML v2 Language Support",
   "description": "Language support for SysML v2 and KerML with LSP-based features",
-  "version": "0.1.11-alpha",
+  "version": "0.1.12-alpha",
   "publisher": "jade-codes",
   "repository": {
     "type": "git",
@@ -112,7 +112,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run build-server && npm run esbuild-base -- --minify",
+    "vscode:prepublish": "npm run build-server && npm run build-stdlib && npm run esbuild-base -- --minify",
     "compile": "tsc -p ./",
     "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
@@ -120,8 +120,9 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint client/src --ext ts",
     "test": "echo \"No tests yet\" && exit 0",
-    "build-server": "cargo install syster-lsp --version 0.1.10-alpha --root ./server-install --force && npm run copy-server && rm -rf ./server-install",
+    "build-server": "cargo install syster-lsp --version 0.1.12-alpha --root ./server-install --force && npm run copy-server && rm -rf ./server-install",
     "copy-server": "mkdir -p server && cp ./server-install/bin/syster-lsp server/syster-lsp-$(node -e \"console.log(process.platform + '-' + process.arch)\")",
+    "build-stdlib": "node scripts/download-stdlib.js",
     "package": "vsce package"
   },
   "dependencies": {
