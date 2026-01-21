@@ -2,6 +2,21 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.1.13-alpha] - 2026-01-21
+
+### Added
+- **Cross-platform binary support** - Downloads pre-built binaries from GitHub releases
+- Support for Linux (x64), macOS (x64, ARM64), and Windows (x64)
+- Automatic fallback to `cargo install` if pre-built binary unavailable
+
+### Changed
+- Build server script now downloads from GitHub releases instead of compiling locally
+- Simplified build process - no longer requires Rust toolchain for users
+
+### Dependencies
+- syster-lsp v0.1.13-alpha (from GitHub releases)
+- syster-base v0.1.12-alpha
+
 ## [0.1.12-alpha] - 2026-01-21
 
 ### Added
