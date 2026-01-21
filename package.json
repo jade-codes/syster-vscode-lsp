@@ -2,7 +2,7 @@
   "name": "sysml-language-support",
   "displayName": "SysML v2 Language Support",
   "description": "Language support for SysML v2 and KerML with LSP-based features",
-  "version": "0.1.12-alpha",
+  "version": "0.1.13-alpha",
   "publisher": "jade-codes",
   "repository": {
     "type": "git",
@@ -120,8 +120,7 @@
     "watch": "tsc -watch -p ./",
     "lint": "eslint client/src --ext ts",
     "test": "echo \"No tests yet\" && exit 0",
-    "build-server": "cargo install syster-lsp --version 0.1.12-alpha --root ./server-install --force && npm run copy-server && rm -rf ./server-install",
-    "copy-server": "mkdir -p server && cp ./server-install/bin/syster-lsp server/syster-lsp-$(node -e \"console.log(process.platform + '-' + process.arch)\")",
+    "build-server": "node scripts/download-server.js",
     "build-stdlib": "node scripts/download-stdlib.js",
     "package": "vsce package"
   },
