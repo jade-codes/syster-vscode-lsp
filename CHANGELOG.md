@@ -2,6 +2,20 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.2.0-alpha] - 2026-01-23
+
+### Fixed
+- **Semantic token positioning** - Fixed 134 bogus tokens at position (0,0) overriding correct package highlighting
+- Added validation filter to skip symbols with invalid span data in semantic tokens
+
+### Changed
+- Updated to Rust edition 2024 with let-chains and improved lifetime handling
+- Improved code style with more concise conditional expressions
+
+### Dependencies
+- syster-lsp v0.2.0-alpha (from GitHub releases)
+- syster-base v0.2.0-alpha
+
 ## [0.1.13-alpha] - 2026-01-21
 
 ### Added
