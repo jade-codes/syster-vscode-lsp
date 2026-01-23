@@ -2,6 +2,15 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.2.1-alpha] - 2026-01-23
+
+### Fixed
+- Re-release to fix Open VSX publishing issue
+
+### Dependencies
+- syster-lsp v0.2.0-alpha (from GitHub releases)
+- syster-base v0.2.0-alpha
+
 ## [0.2.0-alpha] - 2026-01-23
 
 ### Fixed
