@@ -2,6 +2,20 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.2.2-alpha] - 2026-01-24
+
+### Added
+- **Type Definition Navigation** (`textDocument/typeDefinition`) - Navigate from usages directly to their type definitions
+- **Clickable Relationships in Hover** - Relationships now render as markdown links, click to navigate to specialization targets, type definitions, etc.
+- **Range Formatting** (`textDocument/rangeFormatting`) - Format selected code ranges instead of entire documents
+
+### Changed
+- Hover content now uses `MarkupContent` with `MarkupKind::Markdown` for proper link rendering
+
+### Dependencies
+- syster-lsp v0.2.1-alpha (from GitHub releases)
+- syster-base v0.2.1-alpha
+
 ## [0.2.1-alpha] - 2026-01-23
 
 ### Fixed
