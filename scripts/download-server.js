@@ -11,7 +11,9 @@ const path = require('path');
 const { execSync } = require('child_process');
 const os = require('os');
 
-const LSP_VERSION = '0.2.1-alpha';
+// Read LSP version from package.json to keep in sync
+const packageJson = require('../package.json');
+const LSP_VERSION = packageJson.lspVersion;
 const REPO = 'jade-codes/syster-lsp';
 const SERVER_DIR = path.join(__dirname, '..', 'server');
 

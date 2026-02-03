@@ -2,6 +2,20 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.3.0-alpha] - 2026-02-03
+
+### Added
+- **SysML v2 Views Endpoint** (`syster/getSysMLViews`) - Discover and apply standard view definitions
+- **Import/Export Interchange** - Export workspace models and import external models
+
+### Changed
+- Parser refactored to use Rowan-based CST for better error recovery
+- Improved semantic token highlighting accuracy
+
+### Dependencies
+- syster-lsp v0.3.0-alpha (from GitHub releases)
+- syster-base v0.3.0-alpha
+
 ## [0.2.2-alpha] - 2026-01-24
 
 ### Added
