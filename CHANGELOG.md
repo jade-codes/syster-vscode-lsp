@@ -2,6 +2,22 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.3.4-alpha] - 2026-02-10
+
+### Fixed
+- **Visibility Map Inheritance** - Fixed supertype inheritance to avoid self-references in redefining symbols
+- **Root-Level Import Resolution** - Fixed imports at root level not being visible in nested packages
+- **Connection Implicit Supertypes** - Fixed `source`/`target` member resolution in connection definitions
+
+### Changed
+- Scope resolution performance optimized from O(d²) to O(n)
+- Simplified visibility architecture using scope-chain pattern
+- **0 stdlib semantic errors** (down from 3)
+
+### Dependencies
+- syster-lsp v0.3.4-alpha (from GitHub releases)
+- syster-base v0.3.4-alpha
+
 ## [0.3.3-alpha] - 2026-02-10
 
 ### Fixed
