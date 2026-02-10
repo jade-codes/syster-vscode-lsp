@@ -2,6 +2,15 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.3.3-alpha] - 2026-02-10
+
+### Fixed
+- **Feature Chain Hover Resolution** - Hover on feature chains like `takePicture.focus` in perform/exhibit statements now correctly resolves to the target member
+
+### Dependencies
+- syster-lsp v0.3.3-alpha (from GitHub releases)
+- syster-base v0.3.3-alpha
+
 ## [0.3.0-alpha] - 2026-02-03
 
 ### Added
