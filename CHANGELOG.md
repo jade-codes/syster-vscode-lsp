@@ -2,6 +2,17 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.3.5-alpha] - 2026-02-11
+
+### Fixed
+- **`that` Keyword Handling** - Skip validation for the SysML `that` contextual keyword in feature chains
+  - Prevents false positive "Undefined member 'that'" errors in stdlib files
+  - Maintains zero stdlib semantic errors
+
+### Dependencies
+- syster-lsp v0.3.5-alpha (from GitHub releases)
+- syster-base v0.3.5-alpha
+
 ## [0.3.4-alpha] - 2026-02-10
 
 ### Fixed
