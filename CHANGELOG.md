@@ -2,6 +2,15 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.4.0-alpha] - 2026-02-20
+
+### Added
+- **Prefix Metadata Highlighting** — `#MetadataName` syntax now highlighted in both SysML and KerML grammars
+
+### Dependencies
+- syster-lsp v0.4.0-alpha (relationship unification, semantic views, change tracking)
+- syster-base v0.4.0-alpha
+
 ## [0.3.5-alpha] - 2026-02-11
 
 ### Fixed

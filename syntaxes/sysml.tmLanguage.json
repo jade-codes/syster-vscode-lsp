@@ -3,6 +3,7 @@
   "scopeName": "source.sysml",
   "fileTypes": ["sysml"],
   "patterns": [
+    { "include": "#prefixMetadata" },
     { "include": "#keywords" },
     { "include": "#operators" },
     { "include": "#comments" },
@@ -46,6 +47,17 @@
         {
           "name": "constant.language.sysml",
           "match": "\\b(true|false|null|all)\\b"
+        }
+      ]
+    },
+    "prefixMetadata": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.metadata.sysml",
+          "match": "#([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "0": { "name": "entity.name.tag.metadata.sysml" }
+          }
         }
       ]
     },

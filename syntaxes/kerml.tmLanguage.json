@@ -3,6 +3,7 @@
   "scopeName": "source.kerml",
   "fileTypes": ["kerml"],
   "patterns": [
+    { "include": "#prefixMetadata" },
     { "include": "#keywords" },
     { "include": "#operators" },
     { "include": "#comments" },
@@ -38,6 +39,17 @@
         {
           "name": "constant.language.kerml",
           "match": "\\b(true|false|null|all)\\b"
+        }
+      ]
+    },
+    "prefixMetadata": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.metadata.kerml",
+          "match": "#([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "0": { "name": "entity.name.tag.metadata.kerml" }
+          }
         }
       ]
     },
