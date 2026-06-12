@@ -2,6 +2,11 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.4.1-alpha] - 2026-06-12
+
+### Dependencies
+- syster-lsp v0.4.1-alpha — bundles the updated language server, which brings syster-base v0.4.1-alpha: conditional constraint invocation, unified short-form relationship edges, accept-state support, view-definition edges, and byte-stable XMI round-trips
+
 ## [0.4.0-alpha] - 2026-02-20
 
 ### Added
