@@ -47,10 +47,13 @@ run-guidelines:
 	@echo "=== ✓ All guidelines passed! ==="
 
 package:
-	@echo "Downloading all platform binaries..."
-	@node scripts/download-server.js
-	@echo "Packaging extension..."
-	@npx vsce package
+	@echo "Packaging extension (server download + bundle run via vscode:prepublish)..."
+	@if [ "$(PRERELEASE)" = "true" ]; then \
+		echo "  (pre-release build)"; \
+		npx vsce package --pre-release; \
+	else \
+		npx vsce package; \
+	fi
 	@echo "✓ Package created"
 
 clean:

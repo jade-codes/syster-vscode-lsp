@@ -2,6 +2,11 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.4.2-alpha] - 2026-06-30
+
+### Dependencies
+- syster-lsp v0.4.2-alpha — bundles the updated language server, which brings syster-base v0.4.2-alpha: fixes a false-positive `undefined reference` (E0001) on members inherited via a SemanticMetadata `baseType` implicit specialization (e.g. `:> ServiceMethod` inside a `#systemdd`-annotated element), plus three parser fixes (`to` as a feature name, `actor def` definitions, prefix metadata with a body before a member)
+
 ## [0.4.1-alpha] - 2026-06-12
 
 ### Dependencies
