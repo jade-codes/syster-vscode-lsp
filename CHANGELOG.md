@@ -2,6 +2,11 @@
 
 All notable changes to the "SysML v2 Language Support" extension will be documented in this file.
 
+## [0.5.1-alpha] - 2026-07-07
+
+### Dependencies
+- syster-lsp v0.5.1-alpha — bundles the updated language server, which brings syster-base v0.5.1-alpha: a large batch of language features (union/exists/infinity expressions, timing, control nodes `fork`/`join`/`merge`/`decide`, specific definition/usage node kinds, user-defined keywords & `actor def`, explicit Null/Empty types, first-class flow payload, filter brackets, concern references, parallel state; parser internals Pest→Rowan), plus the flow-payload type-reference fix restoring flow-statement hover.
+
 ## [0.4.2-alpha] - 2026-06-30
 
 ### Dependencies
